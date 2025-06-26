@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+
+<head>
+	<title>Console Graphics Converter</title>
+	<meta http-equiv="content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<link type="text/css" rel="stylesheet" href="app/style.css" media="all" />
+	<link rel="shortcut icon" href="./assets/favicon.png" type="image/png" sizes="16x16" />
+	<script type="module" src="app/console-graphics-converter.js"></script>
+</head>
+
+<body>
+	<div id="wrapper">
+		<section id="intro">
+			<header>
+				<h1 class="hide">Console Graphics Converter</h1>
+				<img src="assets/header_logo.png" alt="Console Graphics Converter logo" />
+			</header>
+			<div class="p">
+				<p>
+					This tool can convert a PNG image into valid retro console graphics tile data.
+				</p>
+				<p>
+					Useful if you prefer to store your homebrew and hacks' graphics as common readable and portable images and be able to convert them quickly into binary data.
+				</p>
+				<div id="intro-menu">
+					<p class="text-center">
+						Choose the console you want to convert graphics for and provide a <span class="help" title="width and height must be divisible by 8">valid</span> PNG image to start:
+					</p>
+					<div id="intro-console-selector">
+						<button data-console="dmg"><img src="assets/console_dmg.png" alt="Game Boy" class="input-console-selector input-console-selector-dmg"/></button>
+						<button data-console="cgb"><img src="assets/console_cgb.png" alt="Game Boy Color" class="input-console-selector input-console-selector-cgb"/></button>
+						<button data-console="sfc"><img src="assets/console_sfc.png" alt="Super Nintendo" class="input-console-selector input-console-selector-sfc"/></button>
+						<button data-console="ngpc"><img src="assets/console_ngpc.png" alt="Neo Geo Pocket Color" class="input-console-selector input-console-selector-ngpc"/></button>
+					</div>
+				</div>
+			</section>
+		</section>
+
+		<section id="app" class="hide">
+			<aside>
+				<div id="wrapper-sticky-aside">
+					<div id="aside-header">
+						<img id="logo-console" />
+						<img id="logo" src="assets/logo.png" loading="lazy" alt="Console Graphics Converter" />
+					</div>
+					<hr />
+					<canvas id="canvas-tileset" width="128" height="128"></canvas>
+					<hr />
+					<button id="btn-import" class="btn btn-primary"><img src="assets/octicon_upload.svg" class="octicon" />
+						Import image</button>
+					<input type="file" id="input-file" accept=".png" class="hide" />
+				</div>
+			</aside>
+			<main class="p">
+				<div id="warnings">
+					The following tiles had more than <span id="max-colors"></span> colors:
+					<ul id="ul-warnings"></ul>
+				</div>
+				<nav id="tabs">
+					<button id="btn-tab-palettes" class="btn-tab">Palettes</button>
+					<button id="btn-tab-tiles" class="btn-tab">Tiles</button>
+					<button id="btn-tab-map" class="btn-tab">Map</button>
+				</nav>
+
+				<div id="tab-palettes" class="tab">
+					<div class="toolbar">
+						Export palettes as:
+						<button id="btn-export-palettes" class="btn"><img src="assets/octicon_copy.svg" class="octicon" /> Code</button>
+						<button id="btn-export-palettes2" class="btn"><img src="assets/octicon_download.svg" class="octicon" /> Binary file</button>
+					</div>
+					<div id="palettes"></div>
+				</div>
+
+				<div id="tab-tiles" class="tab">
+					<div class="toolbar">
+						<button type="button" id="btn-quantize" class="btn" style="display:none"><img
+								src="assets/octicon_stack.svg" class="octicon" /> Quantize <span id="span-quantize">0</span>
+							tiles</button>
+						Export tiles as:
+						<button type="button" id="btn-export-tiles" class="btn"><img src="assets/octicon_copy.svg" class="octicon" /> Code</button>
+						<button type="button" id="btn-export-tiles2" class="btn"><img src="assets/octicon_download.svg" class="octicon" /> Binary file</button>
+					</div>
+					<div id="message-pinned-palette">
+						Filtering tiles by palette #<span id="message-pinned-palette-index"></span> <span id="span-remove-pinned-palette" class="clickable">Remove filter</span>
+					</div>
+					<div id="tiles"></div>
+				</div>
+
+				<div id="tab-map" class="tab">
+					<div class="toolbar">
+						Export map as:
+						<button type="button" id="btn-export-map" class="btn"><img src="assets/octicon_copy.svg" class="octicon" /> Code</button>
+						<button type="button" id="btn-export-map2" class="btn"><img src="assets/octicon_download.svg" class="octicon" /> Binary file</button>
+						<div id="container-export-attributes">
+							Export attribute map as:
+							<button type="button" id="btn-export-attributes" class="btn"><img src="assets/octicon_copy.svg" class="octicon" /> Code</button>
+							<button type="button" id="btn-export-attributes2" class="btn"><img src="assets/octicon_download.svg" class="octicon" /> Binary file</button>
+						</div>
+					</div>
+					Dimensions: <span id="span-map-width"></span>&times;<span id="span-map-height"></span>
+					<div id="map" class="text-center"></div>
+				</div>
+			</main>
+		</section>
+	</div>
+
+	<footer>
+		Console Graphics Converter v1.0<br/>
+		by <a href="https://www.marcrobledo.com" target="_blank">Marc Robledo</a>
+		<img src="assets/octicon_github.svg" alt="GitHub logo" class="octicon" /> <a href="https://github.com/marcrobledo/console-graphics-converter/"  target="_blank">See sourcecode in GitHub</a>
+	</footer>
+
+
+
+
+	<!-- POPOVERS -->
+	<div id="popover" class="popover hide">
+		<div id="popover-palette" class="hide">
+			<div class="popover-row"><button id="btn-popover-palette-pin"><img src="assets/octicon_pin.svg" class="octicon" /> Filter tiles</button></div>
+			<div class="popover-row"><button id="btn-popover-palette-up"><img src="assets/octicon_arrow_up.svg" class="octicon" /> Move up</button></div>
+			<div class="popover-row"><button id="btn-popover-palette-down"><img src="assets/octicon_arrow_down.svg" class="octicon" /> Move down</button></div>
+			<div class="popover-row"><button id="btn-popover-palette-remove" class="text-danger"><img src="assets/octicon_trash.svg" class="octicon" /> Remove</button></div>
+		</div>
+		<div id="popover-color" class="hide">
+			<div class="popover-row"><button id="btn-popover-color-edit"><img src="assets/octicon_pencil.svg" class="octicon" /> Change color</button></div>
+			<div class="popover-row"><button id="btn-popover-color-left"><img src="assets/octicon_arrow_left.svg" class="octicon" /> Move left</button></div>
+			<div class="popover-row"><button id="btn-popover-color-right"><img src="assets/octicon_arrow_right.svg" class="octicon" /> Move right</button></div>
+		</div>
+		<div id="popover-tile" class="hide">
+			<div class="popover-row"><button id="btn-popover-tile-up"><img src="assets/octicon_arrow_up.svg" class="octicon" /> Move up</button></div>
+			<div class="popover-row"><button id="btn-popover-tile-down"><img src="assets/octicon_arrow_down.svg" class="octicon" /> Move down</button></div>
+			<div class="popover-row"><button id="btn-popover-tile-remove" class="text-danger"><img src="assets/octicon_trash.svg" class="octicon" /> Remove</button></div>
+		</div>
+	</div>
+
+
+
+	<!-- DIALOGS -->
+	<dialog id="modal-export" class="modal modal-large">
+		<div class="modal-header-only-close">
+			<button class="btn-modal-close"><img src="assets/octicon_x.svg" class="octicon" /></button>
+		</div>
+
+		<div class="modal-row">
+			Export data as:
+			<label><input type="radio" name="export-format" value="rgbds" checked /> RGBDS</label>
+			<label><input type="radio" name="export-format" value="c" /> C</label>
+			<label><input type="radio" name="export-format" value="hex" /> Hex</label>
+			<label><input type="checkbox" id="checkbox-comments" /> Add comments</label>
+			<!-- <label><input type="checkbox" id="checkbox-compressed" disabled /> Compressed</label> -->
+
+			<textarea id="textarea-export" rows="15" readonly wrap="off"></textarea>
+		</div>
+	</dialog>
+
+
+	<dialog id="modal-converter" class="modal">
+		<div class="modal-header-only-close">
+			<button class="btn-modal-close"><img src="assets/octicon_x.svg" class="octicon" /></button>
+		</div>
+
+		<div class="modal-row">
+			<input id="converter-input-color" type="color" class="hide" />
+
+			<div class="flex-space-between" style="gap:24px">
+				<div style="width:160px">
+					<div class="flex-space-between mb">
+						Red
+						<input id="converter-r5" class="input-converter text-right" type="text" size="3" />
+					</div>
+					<div class="flex-space-between mb">
+						Green
+						<input id="converter-g5" class="input-converter text-right" type="text" size="3" />
+					</div>
+					<div class="flex-space-between">
+						Blue
+						<input id="converter-b5" class="input-converter text-right" type="text" size="3" />
+					</div>
+				</div>
+				<div>
+					<div id="converter-color" class="clickable"></div>
+				</div>
+				<div style="width:160px; font-size:150%">
+					<div class="flex-space-between mb">
+						RGB24
+						<input id="converter-rgb24" type="text" size="6" />
+					</div>
+					<div class="flex-space-between">
+						RGB15
+						<input id="converter-rgb15" type="text" size="4" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal-footer">
+			<button class="btn btn-modal-close">Cancel</button>
+			<button class="btn btn-primary btn-modal-close" id="btn-change-color">Change</button>
+		</div>
+	</dialog>
+
+</body>
+
+</html>
