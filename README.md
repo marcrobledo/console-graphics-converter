@@ -3,7 +3,7 @@
 
 This web app can convert a PNG image into valid retro console graphics tile data.
 
-It is useful for console developers who prefer to store their projects' graphics as common readable and portable that can be edited with their favorite image editing program and, then, be able to convert them to binary data easily.
+It is useful for console developers who prefer to store their projects' graphics as common readable and portable images that can be edited with their favorite image editing program and, then, be able to convert them to binary data easily.
 
 **Features:**
 * supported consoles: GB, GBC, SNES and NGPC
