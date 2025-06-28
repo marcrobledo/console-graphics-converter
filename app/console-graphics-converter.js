@@ -1,7 +1,7 @@
 /**
 	@file webapp that converts a PNG image into valid retro consoles graphics data
 	@author Marc Robledo
-	@version 0.1
+	@version 1.0
 	@copyright 2022-2025 Marc Robledo
 	@license
 	This file is released under MIT License

@@ -1,0 +1,27 @@
+{
+	"short_name":"Console Graphics Converter",
+	"name":"Console Graphics Converter",
+	"icons":[
+		{
+			"src": "webapp/favicon114.png",
+			"sizes": "114x114",
+			"type": "image/png",
+			"density": "1.0"
+		},{
+			"src": "webapp/favicon144.png",
+			"sizes": "144x144",
+			"type": "image/png",
+			"density": "1.0"
+		},{
+			"src": "assets/favicon192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"density": "1.0"
+		}
+	],
+	"start_url": "./index.html",
+	"display": "standalone",
+	"orientation": "portrait",
+	"theme_color": "#3c317d",
+	"background_color": "#3c317d"
+}
