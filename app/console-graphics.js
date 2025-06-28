@@ -10,7 +10,7 @@
 
 	Released under MIT License
 
-	Copyright (c) 2022-2024 Marc Robledo
+	Copyright (c) 2022-2025 Marc Robledo
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -701,6 +701,9 @@ export class Tileset {
 
 		const nRows = imageData.height / 8;
 		const nCols = imageData.width / 8;
+		if((nRows * nCols) > 4096)
+			throw new Error('Too many tiles in the image. Reduce your image to a maximum of 4096 tiles before opening it in CGC.');
+
 		const warnings = [];
 
 		const palettes = [];
@@ -720,12 +723,16 @@ export class Tileset {
 				if (tileInfo) {
 					if (readingEmbeddedPalettes && !tileInfo.isEmbeddedPalette)
 						readingEmbeddedPalettes = false;
-					if (tileInfo.tooManyColors)
+					if (tileInfo.tooManyColors){
 						warnings.push({
 							x,
 							y,
 							imageData: tileImageData
 						});
+
+						if(warnings.length > 360)
+							throw new Error('Too many complex tiles that exceed the color limit. Please adapt the image to the console limitations before opening it in CGC.');
+					}
 
 					rowTileInfos.push(tileInfo);
 				}
@@ -789,6 +796,8 @@ export class Tileset {
 				const tilePalette = new consoleGraphics.Palette(colors);
 				tilePalette.sortByLuma();
 				palettes.push(tilePalette);
+				if(palettes.length>64)
+					throw new Error('Too many palettes in the image. Reduce your image to a maximum of 64 palettes before opening it in CGC.');
 			}
 		});
 
