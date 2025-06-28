@@ -1,5 +1,5 @@
 /*
-	Cache Service Worker for Rom Patcher JS by Marc Robledo
+	Cache Service Worker for Console Graphics Converter by Marc Robledo
 	https://github.com/marcrobledo/console-graphics-converter
 	
 	Used to cache the webapp files for offline use
