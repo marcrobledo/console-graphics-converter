@@ -1,4 +1,4 @@
-import { Color, Palette, Tile } from './console-graphics.js';
+import { Color, Palette, Tile, Map } from './console-graphics.js';
 
 
 
@@ -156,10 +156,37 @@ class TileNGPC extends Tile {
 	}
 }
 
+
+class MapNGPC extends Map{	
+	static ALLOW_ATTRIBUTES=true;
+
+	export(){
+		const bytes=new Array(this.height);
+		var index=0;
+		for(var y=0; y<this.height; y++){
+			bytes[y]=new Array(this.width * 2);
+			for(var x=0; x<this.width; x++){
+				const mapTile=this.mapTiles[index];
+				bytes[y][x * 2 + 0]=this.tileset.getTileIndex(mapTile.tile);
+
+				let attributeByte=(this.tileset.getPaletteIndex(mapTile.tile.defaultPalette) & 0b00000111) << 1;
+				if(mapTile.flipX)
+					attributeByte|=0b10000000;
+				if(mapTile.flipY)
+					attributeByte|=0b01000000;
+				bytes[y][x * 2 + 1]=attributeByte;
+				index++;
+			}
+		}
+
+		return bytes;
+	}
+}
+
 export const ConsoleGraphicsNGPC = {
 	id:'ngpc',
 	Color: ColorRGB12,
 	Palette: PaletteNGPC,
 	Tile: TileNGPC,
-	Map: null
+	Map: MapNGPC
 }
