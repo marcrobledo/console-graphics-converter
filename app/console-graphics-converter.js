@@ -393,7 +393,10 @@ const _quantizeMap = function (map, quantizableTiles) {
 	quantizableTiles.forEach((quantizableTileInfo, i) => {
 		const tileToRemove=quantizableTileInfo;
 		const tileToReplace=quantizableTileInfo.duplicateFrom;
-		map.replaceMapTiles(tileToRemove, tileToReplace, false, false);
+		const flippedInfo=tileToReplace.equalsFlipped(tileToRemove);
+		const flipX = typeof flippedInfo==='object'? !!flippedInfo.flipX : false;
+		const flipY = typeof flippedInfo==='object'? !!flippedInfo.flipY : false;
+		map.replaceMapTiles(tileToRemove, tileToReplace, flipX, flipY);
 	});
 }
 const _refreshMap = function () {

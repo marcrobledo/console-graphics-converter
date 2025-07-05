@@ -92,7 +92,7 @@ class MapSNES extends Map{
 				const mapTile=this.mapTiles[index];
 				bytes[y][x * 2 + 0]=this.tileset.getTileIndex(this.mapTiles[index].tile);
 
-				const attributeByte=this.tileset.getPaletteIndex(this.mapTiles[index].tile.defaultPalette) & 0b00000111;
+				let attributeByte=this.tileset.getPaletteIndex(this.mapTiles[index].tile.defaultPalette) & 0b00000111;
 				if(mapTile.flipX)
 					attributeByte|=0b01000000;
 				if(mapTile.flipY)

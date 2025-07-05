@@ -196,7 +196,7 @@ class MapCGB extends Map{
 			bytesAttributes[y]=new Array(this.width);
 			for(var x=0; x<this.width; x++){
 				const mapTile=this.mapTiles[index];
-				const attributeByte=this.tileset.getPaletteIndex(mapTile.tile.defaultPalette) & 0b00000111;
+				let attributeByte=this.tileset.getPaletteIndex(mapTile.tile.defaultPalette) & 0b00000111;
 				if(mapTile.flipX)
 					attributeByte|=0b00100000;
 				if(mapTile.flipY)
