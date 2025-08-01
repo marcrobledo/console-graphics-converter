@@ -160,6 +160,26 @@ class TileNGPC extends Tile {
 class MapNGPC extends Map{	
 	static ALLOW_ATTRIBUTES=true;
 
+	static import(rawData, width, height, tileset) {
+		if (!Array.isArray(rawData) || rawData.length !== (width * height * 2))
+			throw new Error('invalid NGPC map data');
+
+		const map=new this(width, height, tileset);
+
+		for (let y = 0; y < height; y++) {
+			for (let x = 0; x < width; x++) {
+				const tileIndex=rawData[(y * width + x) * 2 + 0];
+				const tileAttributes=rawData[(y * width + x) * 2 + 1];
+
+				const flipX=!!(tileAttributes & 0b10000000);
+				const flipY=!!(tileAttributes & 0b01000000);
+				map.setMapTile(x, y, tileIndex, flipX, flipY);
+			}
+		}
+
+		return map;
+	}
+
 	export(){
 		const bytes=new Array(this.height);
 		var index=0;
