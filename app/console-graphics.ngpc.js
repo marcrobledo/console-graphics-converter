@@ -114,7 +114,7 @@ class TileNGPC extends Tile {
 				const bit0 = (rawData[readOffset] >> (7 - x*2)) & 0x01;
 				const bit1 = (rawData[readOffset] >> (7 - x*2 - 1)) & 0x01;
 
-				pixels[y][x+4] = (bit1 << 1) | bit0;
+				pixels[y][x+4] = (bit0 << 1) | bit1;
 			}
 			readOffset++;
 
@@ -122,7 +122,7 @@ class TileNGPC extends Tile {
 				const bit0 = (rawData[readOffset] >> (7 - x2*2)) & 0x01;
 				const bit1 = (rawData[readOffset] >> (7 - x2*2 - 1)) & 0x01;
 
-				pixels[y][x2+0] = (bit1 << 1) | bit0;
+				pixels[y][x2+0] = (bit0 << 1) | bit1;
 			}
 			readOffset++;
 		}
