@@ -475,35 +475,13 @@ export class Tile {
 		for (var i = 0; i < this._flippedTiles.length; i++) {
 			const equals = this._flippedTiles[i].equals(tile);
 			if (equals) {
-				if (i)
-					return { flipX: i & 0x01, flipY: i & 0x02 };
-				return true;
+				return { flipX: i & 0x01, flipY: i & 0x02 };
 			}
 		}
 		return false;
 	}
 }
 
-
-
-
-
-
-
-
-const _getQuantizableTiles = function (tiles, checkCallback) {
-	const quantizableTiles = tiles.reduce(
-		(acc, tile, i, allTiles) => {
-			const duplicateTiles = allTiles.slice(i + 1).filter((tile2) => checkCallback(acc, tile, tile2));
-			duplicateTiles.forEach((duplicateTile) => {
-				duplicateTile.duplicateFrom = tile;
-			});
-			return acc.concat(duplicateTiles);
-		},
-		[]
-	);
-	return quantizableTiles;
-}
 
 
 export class Tileset {
@@ -566,35 +544,91 @@ export class Tileset {
 	}
 
 	getQuantizableTiles() {
-		/* find duplicate tiles (same data+palette) */
-		const quantizableTiles0 = _getQuantizableTiles(this.tiles, function (acc, tile, tile2) {
-			return !acc.includes(tile) && !acc.includes(tile2) && tile.equals(tile2) && tile.defaultPalette === tile2.defaultPalette
-		});
-		if (quantizableTiles0.length)
-			return quantizableTiles0;
+		const quantizableTiles = [];
 
-		/* find duplicate tiles (same data, different palette) */
-		const quantizableTiles1 = _getQuantizableTiles(this.tiles, function (acc, tile, tile2) {
-			return !acc.includes(tile) && !acc.includes(tile2) && tile.equals(tile2)
-		});
-		if (quantizableTiles1.length)
-			return quantizableTiles1;
+		/* iteration 1: find duplicate tiles (same data+palette) */
+		this.tiles.forEach(function(tile, i){
+			/* ignore tiles that have been identified as duplicates already */
+			if(quantizableTiles.find(quantizableTileInfo => quantizableTileInfo.tile===tile))
+				return;
 
-		/* find duplicate tiles (flipped) */
-		if (this.consoleGraphics.Map && this.consoleGraphics.Map.ALLOW_ATTRIBUTES) {
-			const quantizableTiles2 = _getQuantizableTiles(this.tiles, function (acc, tile, tile2) {
-				return !acc.includes(tile) && !acc.includes(tile2) && tile.equalsFlipped(tile2)
+			this.tiles.slice(i + 1).forEach((tile2, j) => {
+				const tileEquals=tile.equals(tile2);
+				if(tileEquals && tile.defaultPalette === tile2.defaultPalette){
+					quantizableTiles.push({
+						tile: tile2,
+						duplicateFrom: tile,
+						flipX: false,
+						flipY: false
+					})
+				}
 			});
-			if (quantizableTiles2.length)
-				return quantizableTiles2;
+		}, this);
+
+		/* iteration 2: find duplicate tiles (same data, different palette) */
+		if(!quantizableTiles.length){
+			this.tiles.forEach(function(tile, i){
+				/* ignore tiles that have been identified as duplicates already */
+				if(quantizableTiles.find(quantizableTileInfo => quantizableTileInfo.tile===tile))
+					return;
+
+				this.tiles.slice(i + 1).forEach((tile2, j) => {
+					const tileEquals=tile.equals(tile2);
+					if(tileEquals){
+						quantizableTiles.push({
+							tile: tile2,
+							duplicateFrom: tile,
+							flipX: false,
+							flipY: false
+						})
+					}
+				});
+			}, this);
 		}
 
-		return null;
+		/* iteration 3: find duplicate tiles (flipped) */
+		if(!quantizableTiles.length && this.consoleGraphics.Map && this.consoleGraphics.Map.ALLOW_ATTRIBUTES){
+			this.tiles.forEach(function(tile, i){
+				/* ignore tiles that have been identified as duplicates already */
+				if(quantizableTiles.find(quantizableTileInfo => quantizableTileInfo.tile===tile))
+					return;
+
+				this.tiles.slice(i + 1).forEach((tile2, j) => {
+					const tileEquals=tile.equalsFlipped(tile2);
+					if(tileEquals){
+						quantizableTiles.push({
+							tile: tile2,
+							duplicateFrom: tile,
+							flipX: tileEquals.flipX,
+							flipY: tileEquals.flipY
+						})
+					}
+				});
+			}, this);
+		}
+
+		return quantizableTiles;
 	}
-	removeTiles(tiles) {
-		tiles.forEach((tile) => {
-			this.removeTile(tile);
-		});
+	quantize(quantizeMap){
+		const quantizableTiles = this.getQuantizableTiles();
+		if(quantizableTiles){
+			/* remove tiles */
+			quantizableTiles.forEach((tile) => {
+				this.removeTile(tile.tile);
+			});
+
+			/* quantize map (if any) */
+			if(quantizeMap){
+				quantizableTiles.forEach((quantizableTile, i) => {
+					const tileToRemove=quantizableTile.tile;
+					const duplicateFrom=quantizableTile.duplicateFrom;
+					const flipX = quantizableTile.flipX;
+					const flipY = quantizableTile.flipY;
+					quantizeMap.replaceMapTiles(tileToRemove, duplicateFrom, flipX, flipY);
+				});
+			}
+		}
+		return quantizableTiles;
 	}
 
 	swapPalettes(paletteIndex1, paletteIndex2) {

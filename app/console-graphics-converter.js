@@ -1,7 +1,7 @@
 /**
 	@file webapp that converts a PNG image into valid retro consoles graphics data
 	@author Marc Robledo
-	@version 1.0
+	@version 1.1.1
 	@copyright 2022-2025 Marc Robledo
 	@license
 	This file is released under MIT License
@@ -389,16 +389,6 @@ const _refreshTiles = function () {
 
 
 
-const _quantizeMap = function (map, quantizableTiles) {
-	quantizableTiles.forEach((quantizableTileInfo, i) => {
-		const tileToRemove=quantizableTileInfo;
-		const tileToReplace=quantizableTileInfo.duplicateFrom;
-		const flippedInfo=tileToReplace.equalsFlipped(tileToRemove);
-		const flipX = typeof flippedInfo==='object'? !!flippedInfo.flipX : false;
-		const flipY = typeof flippedInfo==='object'? !!flippedInfo.flipY : false;
-		map.replaceMapTiles(tileToRemove, tileToReplace, flipX, flipY);
-	});
-}
 const _refreshMap = function () {
 	if(currentMap){
 		const imageData=currentMap.toImageData();
@@ -433,11 +423,10 @@ const _refreshTileset = function () {
 
 
 
-var currentQuantizableTiles;
 const _refreshQuantizeButton = function () {
-	currentQuantizableTiles = currentTileset.getQuantizableTiles();
-	if(currentQuantizableTiles){
-		$('#span-quantize').html(currentQuantizableTiles.length);
+	const quantizableTiles = currentTileset.getQuantizableTiles();
+	if(quantizableTiles){
+		$('#span-quantize').html(quantizableTiles.length);
 		$('#btn-quantize').show();
 	}else{
 		$('#btn-quantize').hide();
@@ -721,12 +710,7 @@ $(document).ready(function (evt) {
 					const result = Tileset.fromImageData(imageData, ConsoleGraphicsMap[consoleFormat]);
 					if(result.tileset.tiles.length>0xff && this.width!==128){
 						/* too many tiles found, try to quantize */
-						const quantizableTiles=result.tileset.getQuantizableTiles();
-						if(quantizableTiles.length){
-							result.tileset.removeTiles(quantizableTiles);
-							if(result.map)
-								_quantizeMap(result.map, quantizableTiles);
-						}
+						result.tileset.quantize(result.map);
 					}
 
 
@@ -798,14 +782,10 @@ $(document).ready(function (evt) {
 
 
 	$('#btn-quantize').on('click', function(){
-		if(!currentQuantizableTiles)
-			throw new Error('no quantizable tiles found');
+		const quantized=currentTileset.quantize(currentMap);
 
-		currentTileset.removeTiles(currentQuantizableTiles);
-		if(currentMap)
-			_quantizeMap(currentMap, currentQuantizableTiles);
-
-		_refreshCurrentTab(true);
+		if(quantized)
+			_refreshCurrentTab(true);
 	});
 
 
