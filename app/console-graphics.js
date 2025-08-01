@@ -1067,7 +1067,7 @@ export class Map {
 
 		const mapTile = {
 			tile:this.tileset.tiles[tileIndex] || this.tileset.tiles[0],
-			palette:this.tileset.palettes[paletteIndex] || this.palettes[0],
+			palette:this.tileset.palettes[paletteIndex] || this.tileset.palettes[0],
 			flipX: !!flipX,
 			flipY: !!flipY
 		};
