@@ -170,10 +170,11 @@ class MapNGPC extends Map{
 			for (let x = 0; x < width; x++) {
 				const tileIndex=rawData[(y * width + x) * 2 + 0];
 				const tileAttributes=rawData[(y * width + x) * 2 + 1];
+				const paletteIndex=(tileAttributes >> 1) & 0b00000111;
 
 				const flipX=!!(tileAttributes & 0b10000000);
 				const flipY=!!(tileAttributes & 0b01000000);
-				map.setMapTile(x, y, tileIndex, flipX, flipY);
+				map.setMapTile(x, y, tileIndex, paletteIndex, flipX, flipY);
 			}
 		}
 
@@ -189,7 +190,7 @@ class MapNGPC extends Map{
 				const mapTile=this.mapTiles[index];
 				bytes[y][x * 2 + 0]=this.tileset.getTileIndex(mapTile.tile);
 
-				let attributeByte=(this.tileset.getPaletteIndex(mapTile.tile.defaultPalette) & 0b00000111) << 1;
+				let attributeByte=(this.tileset.getPaletteIndex(mapTile.palette) & 0b00000111) << 1;
 				if(mapTile.flipX)
 					attributeByte|=0b10000000;
 				if(mapTile.flipY)

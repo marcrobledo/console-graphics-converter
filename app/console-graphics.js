@@ -624,7 +624,7 @@ export class Tileset {
 					const duplicateFrom=quantizableTile.duplicateFrom;
 					const flipX = quantizableTile.flipX;
 					const flipY = quantizableTile.flipY;
-					quantizeMap.replaceMapTiles(tileToRemove, duplicateFrom, flipX, flipY);
+					quantizeMap.replaceMapTiles(tileToRemove, duplicateFrom, flipX, flipY, true);
 				});
 			}
 		}
@@ -877,6 +877,7 @@ export class Tileset {
 					mapTileInfo.x,
 					mapTileInfo.y,
 					mapTileInfo.tileIndex,
+					tileset.palettes.indexOf(tileset.tiles[mapTileInfo.tileIndex].defaultPalette),
 					false,
 					false
 				);
@@ -1046,6 +1047,7 @@ export class Map {
 		this.tileset = tileset;
 		this.mapTiles = new Array(w * h).fill({
 			tile:this.tileset.tiles[0],
+			palette:this.tileset.tiles[0].defaultPalette,
 			flipX:false,
 			flipY:false,
 		});
@@ -1057,35 +1059,33 @@ export class Map {
 	getMapTile(x, y) {
 		return this.mapTiles[y * this.width + x];
 	}
-	setMapTile(x, y, tileIndex, flipX, flipY) {
+	setMapTile(x, y, tileIndex, paletteIndex, flipX, flipY) {
 		if (typeof tileIndex !== 'number')
 			throw new TypeError('Tile index is not a number');
 		else if (!this.tileset.tiles[tileIndex])
 			throw new TypeError('Invalid tile index');
 
 		const mapTile = {
-			tile:this.tileset.tiles[tileIndex],
-			flipX: false,
-			flipY: false
+			tile:this.tileset.tiles[tileIndex] || this.tileset.tiles[0],
+			palette:this.tileset.palettes[paletteIndex] || this.palettes[0],
+			flipX: !!flipX,
+			flipY: !!flipY
 		};
-
-		if (typeof flipX !== 'undefined')
-			mapTile.flipX = !!flipX;
-		if (typeof flipY !== 'undefined')
-			mapTile.flipY = !!flipY;
 
 		this.mapTiles[y * this.width + x] = mapTile;
 		return mapTile;
 	}
-	replaceMapTiles(tileSearch, tileReplace, flipX, flipY) {
+	replaceMapTiles(tileSearch, tileReplace, flipX, flipY, keepPalette) {
 		const tileReplaceIndex=this.tileset.getTileIndex(tileReplace);
 		if (tileReplaceIndex === -1)
 			throw new TypeError('Invalid tile index to replace');
 
 		for(var y=0; y<this.height; y++){
 			for(var x=0; x<this.width; x++){
-				if(this.mapTiles[y * this.width + x].tile===tileSearch){
-					this.setMapTile(x, y, tileReplaceIndex, flipX, flipY);
+				const mapTile=this.mapTiles[y * this.width + x];
+				if(mapTile.tile===tileSearch){
+					const paletteIndex=this.tileset.palettes.indexOf(keepPalette? mapTile.palette : tileReplace.defaultPalette);
+					this.setMapTile(x, y, tileReplaceIndex, paletteIndex, flipX, flipY);
 				}
 			}
 		}
@@ -1104,7 +1104,7 @@ export class Map {
 			for (var x = 0; x < this.width; x++) {
 				const mapTile = this.mapTiles[index];
 
-				const imageDataTile = mapTile.tile.toImageData(mapTile.tile.defaultPalette, mapTile.flipX, mapTile.flipY);
+				const imageDataTile = mapTile.tile.toImageData(mapTile.palette, mapTile.flipX, mapTile.flipY);
 				ctx.putImageData(imageDataTile, x * 8, y * 8);
 
 				index++;

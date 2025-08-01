@@ -1,7 +1,7 @@
 /**
 	@file webapp that converts a PNG image into valid retro consoles graphics data
 	@author Marc Robledo
-	@version 1.1.1
+	@version 1.2
 	@copyright 2022-2025 Marc Robledo
 	@license
 	This file is released under MIT License
@@ -425,7 +425,7 @@ const _refreshTileset = function () {
 
 const _refreshQuantizeButton = function () {
 	const quantizableTiles = currentTileset.getQuantizableTiles();
-	if(quantizableTiles){
+	if(quantizableTiles.length){
 		$('#span-quantize').html(quantizableTiles.length);
 		$('#btn-quantize').show();
 	}else{
