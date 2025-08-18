@@ -82,6 +82,7 @@ class TileSNES extends Tile {
 
 class MapSNES extends Map{	
 	static ALLOW_ATTRIBUTES=true;
+	static MAX_INDEX=0x3ff;
 
 	export(){
 		const bytes=new Array(this.height);
@@ -92,7 +93,8 @@ class MapSNES extends Map{
 				const mapTile=this.mapTiles[index];
 				bytes[y][x * 2 + 0]=this.tileset.getTileIndex(this.mapTiles[index].tile);
 
-				let attributeByte=(this.tileset.getPaletteIndex(this.mapTiles[index].palette) & 0b00000111) << 2;
+				let attributeByte=this.tileset.getTileIndex(this.mapTiles[index].tile) >> 8;
+				attributeByte|=(this.tileset.getPaletteIndex(this.mapTiles[index].palette) & 0b00000111) << 2;
 				if(mapTile.flipX)
 					attributeByte|=0b01000000;
 				if(mapTile.flipY)
