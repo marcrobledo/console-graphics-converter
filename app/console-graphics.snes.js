@@ -65,10 +65,10 @@ class TileSNES extends Tile {
 			let byte3 = 0x00;
 			for (let x = 0; x < 8; x++) {
 				const colorIndex = this.getPixel(x, y);
-				byte0 |= (colorIndex & 0x01) << 7 - x;
-				byte1 |= (colorIndex >> 1) << 7 - x;
-				byte2 |= (colorIndex >> 2) << 7 - x;
-				byte3 |= (colorIndex >> 3) << 7 - x;
+				byte0 |= ((colorIndex >> 0) & 1) << 7 - x;
+				byte1 |= ((colorIndex >> 1) & 1) << 7 - x;
+				byte2 |= ((colorIndex >> 2) & 1) << 7 - x;
+				byte3 |= ((colorIndex >> 3) & 1) << 7 - x;
 			}
 			data[y * 2 + 0] = byte0;
 			data[y * 2 + 1] = byte1;
@@ -92,7 +92,7 @@ class MapSNES extends Map{
 				const mapTile=this.mapTiles[index];
 				bytes[y][x * 2 + 0]=this.tileset.getTileIndex(this.mapTiles[index].tile);
 
-				let attributeByte=this.tileset.getPaletteIndex(this.mapTiles[index].palette) & 0b00000111;
+				let attributeByte=(this.tileset.getPaletteIndex(this.mapTiles[index].palette) & 0b00000111) << 2;
 				if(mapTile.flipX)
 					attributeByte|=0b01000000;
 				if(mapTile.flipY)
