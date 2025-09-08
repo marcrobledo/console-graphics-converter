@@ -760,13 +760,13 @@ $(document).ready(function (evt) {
 	$('#btn-export-map2').on('click', function () {
 		if(!currentMap.checkValidIndexes())
 			throw new Error('Map contains invalid tile indexes (greater than 0xff)');
-		const mapData = currentMap.export();
+		const mapData = currentMap.export().flat();
 		const u8array = new Uint8Array(mapData);
 		const blob = new Blob([u8array.buffer], { type: 'application/octet-stream' });
 		saveAs(blob, currentTilesetName + '_map.bin');
 	});
 	$('#btn-export-attributes2').on('click', function () {
-		const mapData = currentMap.exportAttributes();
+		const mapData = currentMap.exportAttributes().flat();
 		const u8array = new Uint8Array(mapData);
 		const blob = new Blob([u8array.buffer], { type: 'application/octet-stream' });
 		saveAs(blob, currentTilesetName + '_map_attributes.bin');
