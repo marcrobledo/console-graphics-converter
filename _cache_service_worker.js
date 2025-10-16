@@ -6,7 +6,7 @@
 */
 
 var PRECACHE_ID = 'console-graphics-converter';
-var PRECACHE_VERSION = 'v121';
+var PRECACHE_VERSION = 'v122';
 var PRECACHE_URLS = [
 	'/console-graphics-converter/', '/console-graphics-converter/index.html',
 	'/console-graphics-converter/manifest.json',
