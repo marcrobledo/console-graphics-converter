@@ -1036,6 +1036,8 @@ const _extractTileInfoFromImageData = function (tileImageData, consoleGraphics, 
 
 
 export class Map {
+	static MAX_INDEX = 0xff;
+
 	width;
 	height;
 	tileset;
@@ -1054,7 +1056,7 @@ export class Map {
 	}
 
 	checkValidIndexes(){
-		return !this.mapTiles.find((mapTile) => this.tileset.tiles.indexOf(mapTile.tile)>0xff)
+		return !this.mapTiles.find((mapTile) => this.tileset.tiles.indexOf(mapTile.tile)>this.MAX_INDEX)
 	}
 	getMapTile(x, y) {
 		return this.mapTiles[y * this.width + x];
