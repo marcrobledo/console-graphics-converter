@@ -1055,6 +1055,9 @@ export class Map {
 		});
 	}
 
+	getMaxValidIndex(){
+		return '0x'+this.MAX_INDEX.toString(16);
+	}
 	checkValidIndexes(){
 		return !this.mapTiles.find((mapTile) => this.tileset.tiles.indexOf(mapTile.tile)>this.MAX_INDEX)
 	}

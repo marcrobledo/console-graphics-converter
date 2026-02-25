@@ -159,6 +159,7 @@ class TileNGPC extends Tile {
 
 class MapNGPC extends Map{	
 	static ALLOW_ATTRIBUTES=true;
+	static MAX_INDEX=0x1ff;
 
 	static import(rawData, width, height, tileset) {
 		if (!Array.isArray(rawData) || rawData.length !== (width * height * 2))
@@ -189,7 +190,7 @@ class MapNGPC extends Map{
 			for(var x=0; x<this.width; x++){
 				const mapTile=this.mapTiles[index];
 				const tileIndex=this.tileset.getTileIndex(mapTile.tile);
-				bytes[y][x * 2 + 0]=tileIndex & 0xff;
+				bytes[y][x * 2 + 0]=tileIndex & 0x1ff;
 
 				let attributeByte=(
 					((this.tileset.getPaletteIndex(mapTile.palette) & 0b00001111) << 1) |

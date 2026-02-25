@@ -141,7 +141,7 @@ const refreshExportPalettes = function () {
 const refreshExportMap = function () {
 	try{
 		if(!currentMap.checkValidIndexes())
-			throw new Error('Map contains invalid tile indexes (greater than 0xff)');
+			throw new Error('Map contains invalid tile indexes (greater than '+currentMap.getMaxValidIndex()+')');
 
 		currentExportInfo = currentMap.export().map(function (bytes, i) {
 			return {
@@ -158,7 +158,7 @@ const refreshExportMap = function () {
 const refreshExportAttributes = function () {
 	try{
 		if(!currentMap.checkValidIndexes())
-			throw new Error('Map contains invalid tile indexes (greater than 0xff)');
+			throw new Error('Map contains invalid tile indexes (greater than '+currentMap.getMaxValidIndex()+')');
 
 		currentExportInfo = currentMap.exportAttributes().map(function (bytes, i) {
 			return {
@@ -759,7 +759,7 @@ $(document).ready(function (evt) {
 	});
 	$('#btn-export-map2').on('click', function () {
 		if(!currentMap.checkValidIndexes())
-			throw new Error('Map contains invalid tile indexes (greater than 0xff)');
+			throw new Error('Map contains invalid tile indexes (greater than '+currentMap.getMaxValidIndex()+')');
 		const mapData = currentMap.export().flat();
 		const u8array = new Uint8Array(mapData);
 		const blob = new Blob([u8array.buffer], { type: 'application/octet-stream' });
